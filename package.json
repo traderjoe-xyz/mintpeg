@@ -1,8 +1,8 @@
 {
-  "name": "joepegs-artist-mint",
+  "name": "mintpeg",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/traderjoe-xyz/joepegs-artist-mint.git",
+  "repository": "https://github.com/traderjoe-xyz/mintpeg.git",
   "author": "traderjoexyz",
   "scripts": {
     "compile": "npx hardhat compile"
