@@ -8,23 +8,19 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./MintpegErrors.sol";
 
 contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
-
-	/// @dev Keeps track of Token IDs
-	using Counters for Counters.Counter;
+    /// @dev Keeps track of Token IDs
+    using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-	/// @dev Keeps track of total existent tokens
-    uint256 public totalSupply;
+    /// @notice Emmited on setRoyaltyInfo()
+    /// @param royaltyReceiver Royalty fee collector
+    /// @param feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
+    event RoyaltyInfoChanged(
+        address indexed royaltyReceiver,
+        uint96 feePercent
+    );
 
-	/// @notice Emmited on setRoyaltyInfo()
-	/// @param royaltyReceiver Royalty fee collector
-	/// @param feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
-	event RoyaltyInfoChanged(
-		address indexed royaltyReceiver,
-		uint96 feePercent
-	);
-
-	/// @notice Mintpeg initialization
+    /// @notice Mintpeg initialization
     /// @dev Can only be called once
     /// @param _collectionName ERC721 name
     /// @param _collectionSymbol ERC721 symbol
@@ -51,24 +47,23 @@ contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
         transferOwnership(_projectOwner);
     }
 
-	/// @dev Function to mint new tokens
-	/// @notice Can only be called by project owner
-	/// @param _tokenURIs Array of tokenURIs (probably IPFS) of the tokenIds to be minted
+    /// @dev Function to mint new tokens
+    /// @notice Can only be called by project owner
+    /// @param _tokenURIs Array of tokenURIs (probably IPFS) of the tokenIds to be minted
     function mint(string[] memory _tokenURIs) external onlyOwner {
-		uint256 newTokenId;
+        uint256 newTokenId;
         for (uint256 i = 0; i < _tokenURIs.length; i++) {
-			newTokenId = _tokenIds.current();
+            newTokenId = _tokenIds.current();
             _mint(msg.sender, newTokenId);
             _setTokenURI(newTokenId, _tokenURIs[i]);
-			_tokenIds.increment();
-            totalSupply++;
+            _tokenIds.increment();
         }
     }
 
-	/// @dev Function for changing royalty information
-	/// @notice Can only be called by project owner
-	/// @param _royaltyReceiver Royalty fee collector
-	/// @param _feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
+    /// @dev Function for changing royalty information
+    /// @notice Can only be called by project owner
+    /// @param _royaltyReceiver Royalty fee collector
+    /// @param _feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
     function setRoyaltyInfo(address _royaltyReceiver, uint96 _feePercent)
         external
         onlyOwner
@@ -78,20 +73,22 @@ contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
             revert Mintpeg__InvalidRoyaltyInfo();
         }
         _setDefaultRoyalty(_royaltyReceiver, _feePercent);
-		emit RoyaltyInfoChanged(_royaltyReceiver, _feePercent);
+        emit RoyaltyInfoChanged(_royaltyReceiver, _feePercent);
     }
 
-	/// @dev Function to burn a token
-	/// @notice Can only be called by token owner
-	/// @param _tokenId Token ID to be burnt
+    /// @dev Function to burn a token
+    /// @notice Can only be called by token owner
+    /// @param _tokenId Token ID to be burnt
     function burn(uint256 _tokenId) external {
-        _burn(_tokenId);
-        totalSupply--;
+        if (ownerOf(_tokenId) != msg.sender) {
+            revert Mintpeg_InvalidTokenOwner();
+        }
+        super._burn(_tokenId);
     }
 
-	/// @dev Returns true if this contract implements the interface defined by `interfaceId`
-	/// @notice Needs to be overridden cause two base contracts implement it
-	/// @param _interfaceId InterfaceId to consider. Comes from type(InterfaceContract).interfaceId
+    /// @dev Returns true if this contract implements the interface defined by `interfaceId`
+    /// @notice Needs to be overridden cause two base contracts implement it
+    /// @param _interfaceId InterfaceId to consider. Comes from type(InterfaceContract).interfaceId
     /// @return isInterfaceSupported True if the considered interface is supported
     function supportsInterface(bytes4 _interfaceId)
         public
@@ -100,7 +97,9 @@ contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
         override(ERC721, ERC2981)
         returns (bool)
     {
-        return super.supportsInterface(_interfaceId);
+        return
+            ERC721.supportsInterface(_interfaceId) ||
+            ERC2981.supportsInterface(_interfaceId) ||
+            super.supportsInterface(_interfaceId);
     }
-
 }

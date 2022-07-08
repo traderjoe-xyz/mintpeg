@@ -4,8 +4,7 @@ pragma solidity ^0.8.4;
 import "./Mintpeg.sol";
 
 contract MintpegFactory {
-
-	/// @notice Emitted on createMintpeg()
+    /// @notice Emitted on createMintpeg()
     /// @param mintpeg Address of deployed mintpeg
     /// @param name Mintpeg (ERC721) name
     /// @param symbol Mintpeg (ERC721) symbol
@@ -19,14 +18,14 @@ contract MintpegFactory {
         address indexed royaltyReceiver
     );
 
-	/// @dev number of mintpegs deployed
+    /// @dev number of mintpegs deployed
     uint256 public numOfMintpegs;
 
-	/// @dev Mapping of all deployed mintpegs indexes to their addresses
-	/// @notice Index is not zero based, it starts from 1
+    /// @dev Mapping of all deployed mintpegs indexes to their addresses
+    /// @notice Index is zero based
     mapping(uint256 => address) public allMintpegs;
 
-	/// @notice Function for creating mintpegs
+    /// @notice Function for creating mintpegs
     /// @param _name ERC721 name
     /// @param _symbol ERC721 symbol
     /// @param _projectOwner The project owner
@@ -46,8 +45,8 @@ contract MintpegFactory {
             _royaltyReceiver,
             _feePercent
         );
-        numOfMintpegs++;
         allMintpegs[numOfMintpegs] = address(mintpeg);
+        numOfMintpegs++;
 
         emit MintpegCreated(
             address(mintpeg),
