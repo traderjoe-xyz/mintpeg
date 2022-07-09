@@ -74,9 +74,9 @@ contract Mintpeg is
         uint256 newTokenId;
         for (uint256 i = 0; i < _tokenURIs.length; i++) {
             newTokenId = _tokenIds.current();
+            _tokenIds.increment();
             _mint(msg.sender, newTokenId);
             _setTokenURI(newTokenId, _tokenURIs[i]);
-            _tokenIds.increment();
         }
     }
 
