@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+
 import "./MintpegErrors.sol";
 
-contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
+/// @title Mintpeg Contract
+/// @author Trader Joe
+/// @notice ERC721 contracts for artists to mint NFTs
+contract Mintpeg is
+    ERC721URIStorageUpgradeable,
+    ERC2981Upgradeable,
+    OwnableUpgradeable
+{
     /// @dev Keeps track of Token IDs
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -20,31 +28,47 @@ contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
         uint96 feePercent
     );
 
-    /// @notice Mintpeg initialization
-    /// @dev Can only be called once
+    /// @notice Emmited on initialize()
     /// @param _collectionName ERC721 name
     /// @param _collectionSymbol ERC721 symbol
-    /// @param _projectOwner The project owner
+    /// @param _projectOwner function caller
     /// @param _royaltyReceiver Royalty fee collector
     /// @param _feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
-    constructor(
-        string memory _collectionName,
-        string memory _collectionSymbol,
-        address _projectOwner,
+    event InitializedMintpeg(
+        string indexed _collectionName,
+        string indexed _collectionSymbol,
+        address indexed _projectOwner,
         address _royaltyReceiver,
         uint96 _feePercent
-    ) ERC721(_collectionName, _collectionSymbol) {
+    );
+
+    /// @notice Mintpeg initialization
+    /// @param _collectionName ERC721 name
+    /// @param _collectionSymbol ERC721 symbol
+    /// @param _royaltyReceiver Royalty fee collector
+    /// @param _feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
+    function initialize(
+        string memory _collectionName,
+        string memory _collectionSymbol,
+        address _royaltyReceiver,
+        uint96 _feePercent
+    ) external initializer {
         // Royalty fees are limited to 25%
         if (_feePercent > 2_500) {
             revert Mintpeg__InvalidRoyaltyInfo();
         }
-        _setDefaultRoyalty(_royaltyReceiver, _feePercent);
+        __Ownable_init();
+        __ERC2981_init();
+        __ERC721_init(_collectionName, _collectionSymbol);
 
-        // transfer ownership of contract to project owner
-        if (_projectOwner == address(0)) {
-            revert Mintpeg__InvalidProjectOwner();
-        }
-        transferOwnership(_projectOwner);
+        _setDefaultRoyalty(_royaltyReceiver, _feePercent);
+        emit InitializedMintpeg(
+            _collectionName,
+            _collectionSymbol,
+            msg.sender,
+            _royaltyReceiver,
+            _feePercent
+        );
     }
 
     /// @dev Function to mint new tokens
@@ -81,7 +105,7 @@ contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
     /// @param _tokenId Token ID to be burnt
     function burn(uint256 _tokenId) external {
         if (ownerOf(_tokenId) != msg.sender) {
-            revert Mintpeg_InvalidTokenOwner();
+            revert Mintpeg__InvalidTokenOwner();
         }
         super._burn(_tokenId);
     }
@@ -94,12 +118,12 @@ contract Mintpeg is ERC721URIStorage, ERC2981, Ownable {
         public
         view
         virtual
-        override(ERC721, ERC2981)
+        override(ERC721Upgradeable, ERC2981Upgradeable)
         returns (bool)
     {
         return
-            ERC721.supportsInterface(_interfaceId) ||
-            ERC2981.supportsInterface(_interfaceId) ||
+            ERC721Upgradeable.supportsInterface(_interfaceId) ||
+            ERC2981Upgradeable.supportsInterface(_interfaceId) ||
             super.supportsInterface(_interfaceId);
     }
 }
