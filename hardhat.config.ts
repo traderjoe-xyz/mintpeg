@@ -23,20 +23,44 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.4",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    ],
+  },
+  defaultNetwork: "hardhat",
   networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    hardhat: {},
+    fuji: {
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
+      gasPrice: 26000000000,
+      chainId: 43113,
+      accounts: process.env.DEPLOY_PRIVATE_KEY
+        ? [process.env.DEPLOY_PRIVATE_KEY]
+        : [],
+    },
+    avalanche: {
+      url: "https://api.avax.network/ext/bc/C/rpc",
+      gasPrice: 26000000000,
+      chainId: 43114,
+      accounts: process.env.DEPLOY_PRIVATE_KEY
+        ? [process.env.DEPLOY_PRIVATE_KEY]
+        : [],
     },
   },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-  },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      avalanche: process.env.SNOWTRACE_API_KEY || "",
+      avalancheFujiTestnet: process.env.SNOWTRACE_API_KEY || "",
+    },
   },
 };
 

@@ -16,8 +16,8 @@ contract Mintpeg is
     ERC2981Upgradeable,
     OwnableUpgradeable
 {
-    /// @dev Keeps track of Token IDs
     using Counters for Counters.Counter;
+
     Counters.Counter private _tokenIds;
 
     /// @notice Emmited on setRoyaltyInfo()
@@ -53,15 +53,11 @@ contract Mintpeg is
         address _royaltyReceiver,
         uint96 _feePercent
     ) external initializer {
-        // Royalty fees are limited to 25%
-        if (_feePercent > 2_500) {
-            revert Mintpeg__InvalidRoyaltyInfo();
-        }
         __Ownable_init();
         __ERC2981_init();
         __ERC721_init(_collectionName, _collectionSymbol);
+        setRoyaltyInfo(_royaltyReceiver, _feePercent);
 
-        _setDefaultRoyalty(_royaltyReceiver, _feePercent);
         emit InitializedMintpeg(
             _collectionName,
             _collectionSymbol,
@@ -71,8 +67,8 @@ contract Mintpeg is
         );
     }
 
-    /// @dev Function to mint new tokens
-    /// @notice Can only be called by project owner
+    /// @notice Function to mint new tokens
+    /// @dev Can only be called by project owner
     /// @param _tokenURIs Array of tokenURIs (probably IPFS) of the tokenIds to be minted
     function mint(string[] memory _tokenURIs) external onlyOwner {
         uint256 newTokenId;
@@ -84,12 +80,13 @@ contract Mintpeg is
         }
     }
 
-    /// @dev Function for changing royalty information
-    /// @notice Can only be called by project owner
+    /// @notice Function for changing royalty information
+    /// @dev Can only be called by project owner
+    /// @dev owner can prevent any sale by setting the address to any address that can't receive AVAX.
     /// @param _royaltyReceiver Royalty fee collector
     /// @param _feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
     function setRoyaltyInfo(address _royaltyReceiver, uint96 _feePercent)
-        external
+        public
         onlyOwner
     {
         // Royalty fees are limited to 25%
@@ -100,8 +97,8 @@ contract Mintpeg is
         emit RoyaltyInfoChanged(_royaltyReceiver, _feePercent);
     }
 
-    /// @dev Function to burn a token
-    /// @notice Can only be called by token owner
+    /// @notice Function to burn a token
+    /// @dev Can only be called by token owner
     /// @param _tokenId Token ID to be burnt
     function burn(uint256 _tokenId) external {
         if (ownerOf(_tokenId) != msg.sender) {
@@ -110,10 +107,10 @@ contract Mintpeg is
         super._burn(_tokenId);
     }
 
-    /// @dev Returns true if this contract implements the interface defined by `interfaceId`
-    /// @notice Needs to be overridden cause two base contracts implement it
+    /// @notice Returns true if this contract implements the interface defined by `interfaceId`
+    /// @dev Needs to be overridden cause two base contracts implement it
     /// @param _interfaceId InterfaceId to consider. Comes from type(InterfaceContract).interfaceId
-    /// @return isInterfaceSupported True if the considered interface is supported
+    /// @return bool True if the considered interface is supported
     function supportsInterface(bytes4 _interfaceId)
         public
         view

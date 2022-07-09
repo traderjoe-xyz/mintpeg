@@ -5,7 +5,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./Mintpeg.sol";
+import "./MintpegErrors.sol";
 import "./interfaces/IMintpeg.sol";
 
 /// @title Mintpeg Factory
@@ -28,15 +28,11 @@ contract MintpegFactory is Ownable {
         uint96 royaltyFee
     );
 
-    /// @dev number of mintpegs deployed
-    uint256 public numOfMintpegs;
-
     /// @notice Mintpeg contract to be cloned
     address public mintpegImplementation;
 
-    /// @notice Mapping of all deployed mintpegs indexes to their addresses
-    /// @dev Index is zero based
-    mapping(uint256 => address) public allMintpegs;
+    /// @notice Array of all deployed mintpeg addresses
+    address[] public allMintpegs;
 
     /// @notice Mapping of adresses (deployer) to created mintpegs
     mapping(address => address[]) public createdMintpegs;
@@ -66,9 +62,8 @@ contract MintpegFactory is Ownable {
             _royaltyReceiver,
             _feePercent
         );
-        allMintpegs[numOfMintpegs] = mintpeg;
+        allMintpegs.push(mintpeg);
         createdMintpegs[msg.sender].push(mintpeg);
-        numOfMintpegs++;
 
         emit MintpegCreated(
             address(mintpeg),
@@ -92,5 +87,21 @@ contract MintpegFactory is Ownable {
 
         mintpegImplementation = _mintpegImplementation;
         emit SetMintpegImplementation(_mintpegImplementation);
+    }
+
+    /// @notice Function to get number of mintpegs deployed by an address
+    /// @param _deployer Address of mintpeg(s) deployer
+    function getNumberOfMintpegsCreated(address _deployer)
+        external
+        view
+        returns (uint256)
+    {
+        return createdMintpegs[_deployer].length;
+    }
+
+    /// @notice Function to get number of mintpegs deployed
+    /// @return uint256 number of all mintpegs deployed
+    function getTotalMintpegsCount() external view returns (uint256) {
+        return allMintpegs.length;
     }
 }

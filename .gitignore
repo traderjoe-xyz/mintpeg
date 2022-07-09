@@ -4,9 +4,9 @@ coverage
 coverage.json
 typechain
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts
 
-#Dev files
+# Dev files
 playground.ts
