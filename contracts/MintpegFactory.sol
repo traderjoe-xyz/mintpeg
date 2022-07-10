@@ -104,4 +104,10 @@ contract MintpegFactory is Ownable {
     function getTotalMintpegsCount() external view returns (uint256) {
         return allMintpegs.length;
     }
+
+    /// @notice Function to get address of current mintpeg implementation
+    /// @return address current mintpeg implementation
+    function getMintpegImplementation() external view returns (address) {
+        return mintpegImplementation;
+    }
 }
