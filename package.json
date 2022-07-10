@@ -5,7 +5,8 @@
   "repository": "https://github.com/traderjoe-xyz/mintpeg.git",
   "author": "traderjoexyz",
   "scripts": {
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test --network hardhat"
   },
   "license": "MIT",
   "devDependencies": {
