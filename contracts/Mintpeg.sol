@@ -28,6 +28,16 @@ contract Mintpeg is
         uint96 feePercent
     );
 
+    /// @notice Emmited on setTokenRoyaltyInfo()
+    /// @param tokenId Token ID royalty to be set
+    /// @param royaltyReceiver Royalty fee collector
+    /// @param feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
+    event TokenRoyaltyInfoChanged(
+        uint256 tokenId,
+        address indexed royaltyReceiver,
+        uint96 feePercent
+    );
+
     /// @notice Emmited on initialize()
     /// @param _collectionName ERC721 name
     /// @param _collectionSymbol ERC721 symbol
@@ -97,6 +107,25 @@ contract Mintpeg is
         emit RoyaltyInfoChanged(_royaltyReceiver, _feePercent);
     }
 
+    /// @notice Function for changing token royalty information
+    /// @dev Can only be called by project owner
+    /// @dev owner can prevent any sale by setting the address to any address that can't receive AVAX.
+    /// @param _tokenId Token ID royalty to be set
+    /// @param _royaltyReceiver Royalty fee collector
+    /// @param _feePercent Royalty fee numerator; denominator is 10,000. So 500 represents 5%
+    function setTokenRoyaltyInfo(
+        uint256 _tokenId,
+        address _royaltyReceiver,
+        uint96 _feePercent
+    ) public onlyOwner {
+        // Royalty fees are limited to 25%
+        if (_feePercent > 2_500) {
+            revert Mintpeg__InvalidRoyaltyInfo();
+        }
+        _setTokenRoyalty(_tokenId, _royaltyReceiver, _feePercent);
+        emit TokenRoyaltyInfoChanged(_tokenId, _royaltyReceiver, _feePercent);
+    }
+
     /// @notice Function to burn a token
     /// @dev Can only be called by token owner
     /// @param _tokenId Token ID to be burnt
@@ -105,6 +134,7 @@ contract Mintpeg is
             revert Mintpeg__InvalidTokenOwner();
         }
         super._burn(_tokenId);
+        _resetTokenRoyalty(_tokenId);
     }
 
     /// @notice Returns true if this contract implements the interface defined by `interfaceId`
