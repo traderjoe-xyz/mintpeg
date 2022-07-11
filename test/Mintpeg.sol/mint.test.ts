@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { Contract, ContractFactory } from "ethers";
-import { MintpegInitProps } from "../index"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
 
 describe("mint", () => {
   let dev: SignerWithAddress;
@@ -24,23 +24,9 @@ describe("mint", () => {
     };
   });
 
-  const initializeMintpeg = async ({
-    _collectionName,
-    _collectionSymbol,
-    _royaltyReceiver,
-    _feePercent,
-  }: Partial<MintpegInitProps>) => {
-    await Mintpeg.connect(dev).initialize(
-      _collectionName || mintpegInit._collectionName,
-      _collectionSymbol || mintpegInit._collectionSymbol,
-      _royaltyReceiver || mintpegInit._royaltyReceiver,
-      _feePercent || mintpegInit._feePercent
-    );
-  };
-
   it("should mint a number of tokens equavalent to the length of the tokenURIs passed when called by the contract owner", async () => {
     const tokenURIs: string[] = ["token0.joepegs.com", "token1.joepegs.com"];
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     await Mintpeg.connect(dev).mint(tokenURIs);
 
     expect(await Mintpeg.balanceOf(dev.address)).to.equal(tokenURIs.length);
@@ -50,7 +36,7 @@ describe("mint", () => {
 
   it("should revert when an address other than the owner tries to mint new token(s)", async () => {
     const tokenURIs: string[] = ["token0.joepegs.com", "token1.joepegs.com"];
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
 
     await expect(Mintpeg.connect(alice).mint([tokenURIs[0]])).to.be.reverted;
     await expect(Mintpeg.connect(alice).mint(tokenURIs)).to.be.reverted;

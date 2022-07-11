@@ -105,12 +105,6 @@ contract MintpegFactory is Ownable {
         return allMintpegs.length;
     }
 
-    /// @notice Function to get address of current mintpeg implementation
-    /// @return address current mintpeg implementation
-    function getMintpegImplementation() external view returns (address) {
-        return mintpegImplementation;
-    }
-
     /// @notice Function to get address of deployed mintpeg at given index
     /// @dev Should be used with getNumberOfMintpegsCreated() to prevent running into
     /// out-of-range index errors

@@ -40,7 +40,7 @@ describe("setMintpegImplementation", () => {
   it("should set mintpegImplementation to the address passed to function", async () => {
     await MintpegFactory.connect(dev).setMintpegImplementation(Mintpeg.address);
 
-    expect(await MintpegFactory.getMintpegImplementation()).to.equal(
+    expect(await MintpegFactory.mintpegImplementation()).to.equal(
       Mintpeg.address
     );
   });

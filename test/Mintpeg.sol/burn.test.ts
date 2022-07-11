@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps } from "../index"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
 
 describe("burn", () => {
   let dev: SignerWithAddress;
@@ -24,22 +24,8 @@ describe("burn", () => {
     };
   });
 
-  const initializeMintpeg = async ({
-    _collectionName,
-    _collectionSymbol,
-    _royaltyReceiver,
-    _feePercent,
-  }: Partial<MintpegInitProps>) => {
-    await Mintpeg.connect(dev).initialize(
-      _collectionName || mintpegInit._collectionName,
-      _collectionSymbol || mintpegInit._collectionSymbol,
-      _royaltyReceiver || mintpegInit._royaltyReceiver,
-      _feePercent || mintpegInit._feePercent
-    );
-  };
-
   it("should revert if tokenId is not owned by function's caller", async () => {
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     await Mintpeg.connect(dev).mint([
       "token0.joepegs.com",
       "token0.joepegs.com",
@@ -55,7 +41,7 @@ describe("burn", () => {
   });
 
   it("should reset the royalty informaton of the burned tokenId to the global default", async () => {
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     await Mintpeg.connect(dev).mint(["token0.joepegs.com"]);
     await Mintpeg.connect(dev).setTokenRoyaltyInfo(0, dev.address, 1000); // set individual token royalty
     await Mintpeg.connect(dev).burn(0);
@@ -78,7 +64,7 @@ describe("burn", () => {
 
   it("should reduce the number of tokens owned by function caller by 1", async () => {
     const tokenURIs: string[] = ["token0.joepegs.com", "token1.joepegs.com"];
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     await Mintpeg.connect(dev).mint(tokenURIs);
     await Mintpeg.connect(dev).burn(0);
 

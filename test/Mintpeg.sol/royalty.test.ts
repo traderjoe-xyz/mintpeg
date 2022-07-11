@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps } from "../index"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
 
 describe("royalty", () => {
   let dev: SignerWithAddress;
@@ -24,23 +24,9 @@ describe("royalty", () => {
     };
   });
 
-  const initializeMintpeg = async ({
-    _collectionName,
-    _collectionSymbol,
-    _royaltyReceiver,
-    _feePercent,
-  }: Partial<MintpegInitProps>) => {
-    await Mintpeg.connect(dev).initialize(
-      _collectionName || mintpegInit._collectionName,
-      _collectionSymbol || mintpegInit._collectionSymbol,
-      _royaltyReceiver || mintpegInit._royaltyReceiver,
-      _feePercent || mintpegInit._feePercent
-    );
-  };
-
   describe("setRoyaltyInfo", () => {
     it("should revert if royalty percent is more than 25% (2500)", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
 
       await expect(
         Mintpeg.connect(dev).setRoyaltyInfo(dev.address, 2501)
@@ -48,14 +34,14 @@ describe("royalty", () => {
     });
 
     it("should revert if royalty is attempted to be set by an address other than the owner", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
 
       await expect(Mintpeg.connect(alice).setRoyaltyInfo(alice.address, 1000))
         .to.be.reverted;
     });
 
     it("should emit `RoyaltyInfoChanged` event when royalty is successfuly set", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
 
       await expect(Mintpeg.connect(dev).setRoyaltyInfo(alice.address, 1000))
         .to.emit(Mintpeg, "RoyaltyInfoChanged")
@@ -63,7 +49,7 @@ describe("royalty", () => {
     });
 
     it("should set the royalty information of the contract to the royalty details passed at deployment", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
       await Mintpeg.connect(dev).mint(["token0.joepegs.com"]);
       const royaltyDenominator: BigNumber = BigNumber.from("10000"); // default _feeDenominator implemented by openzeppelin ERC2981 contract
       const salePrice: BigNumber = ethers.utils.parseEther("1");
@@ -87,7 +73,7 @@ describe("royalty", () => {
 
   describe("setTokenRoyaltyInfo", () => {
     it("should revert if token royalty percent is more than 25% (2500)", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
       await Mintpeg.connect(dev).mint(["token0.joepegs.com"]);
 
       await expect(
@@ -96,7 +82,7 @@ describe("royalty", () => {
     });
 
     it("should revert if token royalty is attempted to be set by an address other than the owner", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
       await Mintpeg.connect(dev).mint(["token0.joepegs.com"]);
 
       await expect(
@@ -108,7 +94,7 @@ describe("royalty", () => {
     });
 
     it("should emit `TokenRoyaltyInfoChanged` event when token royalty is successfuly set", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
       await Mintpeg.connect(dev).mint(["token0.joepegs.com"]);
 
       await expect(
@@ -119,7 +105,7 @@ describe("royalty", () => {
     });
 
     it("should set the token royalty information of the given tokenId only", async () => {
-      await initializeMintpeg({});
+      await initializeMintpeg(Mintpeg, {}, mintpegInit);
       const tokenURIs: string[] = ["token0.joepegs.com", "token1.joepegs.com"];
       await Mintpeg.connect(dev).mint(tokenURIs);
 

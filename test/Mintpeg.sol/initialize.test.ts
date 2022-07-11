@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps } from "../index"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
 
 describe("initialize", () => {
   let dev: SignerWithAddress;
@@ -23,37 +23,23 @@ describe("initialize", () => {
     };
   });
 
-  const initializeMintpeg = async ({
-    _collectionName,
-    _collectionSymbol,
-    _royaltyReceiver,
-    _feePercent,
-  }: Partial<MintpegInitProps>) => {
-    await Mintpeg.connect(dev).initialize(
-      _collectionName || mintpegInit._collectionName,
-      _collectionSymbol || mintpegInit._collectionSymbol,
-      _royaltyReceiver || mintpegInit._royaltyReceiver,
-      _feePercent || mintpegInit._feePercent
-    );
-  };
-
   it("should set the owner of the contract to the deployer", async () => {
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     expect(await Mintpeg.owner()).to.equal(dev.address);
   });
 
   it("should set the name of the contract to the collection name passed at deployment", async () => {
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     expect(await Mintpeg.name()).to.equal(mintpegInit._collectionName);
   });
 
   it("should set the symbol of the contract to the collection symbol passed at deployment", async () => {
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     expect(await Mintpeg.symbol()).to.equal(mintpegInit._collectionSymbol);
   });
 
   it("should set the royalty information of the contract to the royalty details passed at deployment", async () => {
-    await initializeMintpeg({});
+    await initializeMintpeg(Mintpeg, {}, mintpegInit);
     await Mintpeg.connect(dev).mint(["token0.joepegs.com"]);
     const royaltyDenominator: BigNumber = BigNumber.from("10000"); // default _feeDenominator implemented by openzeppelin ERC2981 contract
     const salePrice: BigNumber = ethers.utils.parseEther("1");
@@ -69,9 +55,9 @@ describe("initialize", () => {
   });
 
   it("should revert if royalty percent is more than 25% (2500)", async () => {
-    await expect(initializeMintpeg({ _feePercent: 2501 })).to.be.revertedWith(
-      "Mintpeg__InvalidRoyaltyInfo()"
-    );
+    await expect(
+      initializeMintpeg(Mintpeg, { _feePercent: 2501 }, mintpegInit)
+    ).to.be.revertedWith("Mintpeg__InvalidRoyaltyInfo()");
   });
 
   it("should emit `InitializedMintpeg` event with the deployment information", async () => {
