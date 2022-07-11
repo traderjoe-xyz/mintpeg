@@ -110,4 +110,17 @@ contract MintpegFactory is Ownable {
     function getMintpegImplementation() external view returns (address) {
         return mintpegImplementation;
     }
+
+    /// @notice Function to get address of deployed mintpeg at given index
+    /// @dev Should be used with getNumberOfMintpegsCreated() to prevent running into
+    /// out-of-range index errors
+    /// @param _deployer Address of mintpeg(s) deployer
+    /// @param _createdMintpegIndex Index of Mintpeg to be returned
+    /// @return address Address of the Mintpeg implementation at given index
+    function getMintpegCreatedAtIndex(
+        address _deployer,
+        uint256 _createdMintpegIndex
+    ) external view returns (address) {
+        return createdMintpegs[_deployer][_createdMintpegIndex];
+    }
 }
