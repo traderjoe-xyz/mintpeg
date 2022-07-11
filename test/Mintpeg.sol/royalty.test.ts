@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps } from "../index";
+import { MintpegInitProps } from "./index"; // eslint-disable-line node/no-missing-import
 
 describe("royalty", () => {
   let dev: SignerWithAddress;
