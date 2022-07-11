@@ -6,13 +6,12 @@ import { MintpegInitProps } from "../index";
 
 describe("initialize", () => {
   let dev: SignerWithAddress;
-  let alice: SignerWithAddress;
   let Mintpeg: Contract;
   let MintpegCF: ContractFactory;
   let mintpegInit: MintpegInitProps;
 
   beforeEach(async () => {
-    [dev, alice] = await ethers.getSigners();
+    [dev] = await ethers.getSigners();
     MintpegCF = await ethers.getContractFactory("Mintpeg");
     Mintpeg = await MintpegCF.deploy();
     await Mintpeg.deployed();
