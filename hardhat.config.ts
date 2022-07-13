@@ -10,6 +10,8 @@ import "solidity-coverage";
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
+import "./tasks/deploy-mintpeg";
+import "./tasks/mintpeg-implementation";
 
 dotenv.config();
 
