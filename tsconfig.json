@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
+    "paths": { "hardhat/types": ["node_modules/hardhat/types/index"] },
     "target": "es2018",
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./"
   },
-  "include": ["./scripts", "./test", "./typechain"],
+  "include": ["./scripts", "./test", "./typechain", "./deploy", "./tasks"],
   "files": ["./hardhat.config.ts"]
 }

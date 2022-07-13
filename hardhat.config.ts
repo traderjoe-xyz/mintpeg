@@ -1,3 +1,4 @@
+/* eslint-disable node/no-missing-import */
 import * as dotenv from "dotenv";
 
 import { HardhatUserConfig, task } from "hardhat/config";
@@ -6,6 +7,9 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import "@nomiclabs/hardhat-ethers";
+import "hardhat-deploy";
+import "hardhat-deploy-ethers";
 
 dotenv.config();
 
@@ -55,6 +59,9 @@ const config: HardhatUserConfig = {
         ? [process.env.DEPLOY_PRIVATE_KEY]
         : [],
     },
+  },
+  namedAccounts: {
+    deployer: 0,
   },
   etherscan: {
     apiKey: {
