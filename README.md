@@ -17,7 +17,7 @@ Main contract that implements `ERC721URIStorage` and `ERC2981` contracts. It all
 
 Contract factory that deploy and keep track of `Mintpeg` contracts using the parameters specified below. It keeps track of the addresses of all created mintpegs and the mintpegs created by individual addresses.
 
-##### initialize / configuaration
+##### initialize / configure
 
 `_collectionName`: name of the NFT collection
 `_collectionSymbol`: symbol of the NFT collection
@@ -51,15 +51,30 @@ DEPLOY_PRIVATE_KEY=
 SNOWTRACE_API_KEY=
 ```
 
+Deploying MintpegFactory and Mintpeg implementation is made using `yarn deploy-<<network>>` where network is either `fuji` or `mainnet`(avalanche). Creating Mintpegs then uses deploy scripts:
+The deploy task takes a config file as parameter. This file contains all the required parameters to initialize a Mintpeg contract.
+
+An example template is available in `/tasks/config/example-mintpeg.json`.
+
+Once the configuration is ready, you may run:
+
+```
+yarn compile
+
+yarn deploy-mintpeg-fuji --config-filename <config-filename>
+
+yarn verify-fuji
+```
+
 ## Test coverage
 
 Test coverage on current commit `fd24448` is the following :
-File | % Stmts | % Branch | % Funcs | % Lines |
+File                   |  % Stmts | % Branch |  % Funcs |  % Lines |
 -----------------------|----------|----------|----------|----------|
-Mintpeg.sol | 95.24 | 100 | 83.33 | 95.83 |
-MinpegErrors.sol | 100 | 100 | 100 | 100 |
-MintpegFactory.sol | 100 | 100 | 100 | 100 |
-**All files** | 97.06 | 100 | 91.67 | 97.44 |
+  Mintpeg.sol          |    95.24 |      100 |    83.33 |    95.83 |
+  MinpegErrors.sol     |      100 |      100 |      100 |      100 |
+  MintpegFactory.sol   |      100 |      100 |      100 |      100 |
+  **All files**        |    97.06 |      100 |    91.67 |    97.44 |
 
 Coverage was calculated by the `solidity-coverage` plugin from hardhat.
 
