@@ -12,6 +12,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("Mintpeg", {
     from: deployer,
     args: [],
+    proxy: {
+      proxyContract: "OpenZeppelinTransparentProxy",
+      execute: {
+        init: {
+          methodName: "initialize",
+          args: ["JOEpeg", "JPG", deployer, 500],
+        },
+      },
+    },
     log: true,
     autoMine: true, // speed up deployment on local network (ganache, hardhat), no effect on live networks
   });
