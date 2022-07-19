@@ -46,5 +46,7 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
       mintpegNumber.sub(BigNumber.from(1))
     );
 
+    // TODO: verify deployed mintpeg contract
+
     console.log(`-- Mintpeg deployed at ${mintpegAddress} --`);
   });
