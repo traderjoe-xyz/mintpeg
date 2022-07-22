@@ -12,7 +12,7 @@
     "deploy-mintpeg-fuji": "npx hardhat deploy-mintpeg --network fuji",
     "deploy-mainnet": "npx hardhat deploy --network avalanche",
     "deploy-mintpeg-mainnet": "npx hardhat deploy-mintpeg --network avalanche",
-    "verify-fuji": "npx hardhat run scripts/verify.ts --network fuji",
+    "verify-fuji": "npx hardhat etherscan-verify  --network avalanche",
     "verify-mainnet": "npx hardhat etherscan-verify  --network avalanche"
   },
   "license": "MIT",

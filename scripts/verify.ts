@@ -1,11 +1,11 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-export default async function main(
+export default async (
   hre: HardhatRuntimeEnvironment,
   contractName: string,
   address: string | undefined,
   constructorArguments: any[]
-) {
+) => {
   if (!address) {
     throw new Error(`undefined contract address for ${contractName}`);
   }
@@ -25,4 +25,4 @@ export default async function main(
       throw err;
     }
   }
-}
+};

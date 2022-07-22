@@ -3,7 +3,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import verify from "../scripts/verify";
 
-async function main(hre: HardhatRuntimeEnvironment) {
+module.exports = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
 
@@ -16,12 +16,11 @@ async function main(hre: HardhatRuntimeEnvironment) {
     autoMine: true, // speed up deployment on local network (ganache, hardhat), no effect on live networks
   });
 
-  verify(
+  await verify(
     hre,
     "contracts/MintpegFactory.sol:MintpegFactory",
     mintpegFactoryContract.address,
     []
   );
-}
-module.exports = main;
+};
 module.exports.tags = ["MintpegFactory"];

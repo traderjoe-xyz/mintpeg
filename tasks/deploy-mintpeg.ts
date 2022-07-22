@@ -4,8 +4,9 @@ import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import { task } from "hardhat/config";
-import { loadLaunchConfig } from "./utils";
+import { loadLaunchConfig, delay } from "./utils";
 import { BigNumber } from "ethers";
+import verify from "scripts/verify";
 
 interface MintpegDeployProps {
   configFilename: string;
@@ -46,7 +47,12 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
       mintpegNumber.sub(BigNumber.from(1))
     );
 
-    // TODO: verify deployed mintpeg contract
-
     console.log(`-- Mintpeg deployed at ${mintpegAddress} --`);
+
+    const delayTime = 60;
+    console.log(
+      `-- Waiting for ${delayTime} seconds for Snowtrace to index Mintpeg Contract --`
+    );
+    await delay(delayTime);
+    await verify(hre, "contracts/Mintpeg.sol:Mintpeg", mintpegAddress, []);
   });

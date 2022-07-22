@@ -6,3 +6,7 @@ export const loadLaunchConfig = (filename: string) => {
   const launchConfig = JSON.parse(fs.readFileSync(file, "utf8"));
   return launchConfig;
 };
+
+export const delay = async (seconds: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};

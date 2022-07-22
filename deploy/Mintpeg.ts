@@ -3,7 +3,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import verify from "../scripts/verify";
 
-async function main(hre: HardhatRuntimeEnvironment) {
+module.exports = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
 
@@ -31,6 +31,5 @@ async function main(hre: HardhatRuntimeEnvironment) {
     mintpegContract.implementation,
     []
   );
-}
-module.exports = main;
+};
 module.exports.tags = ["Mintpeg"];
