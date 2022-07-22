@@ -6,7 +6,7 @@ import "hardhat-deploy-ethers";
 import { task } from "hardhat/config";
 import { loadLaunchConfig, delay } from "./utils";
 import { BigNumber } from "ethers";
-import verify from "scripts/verify";
+import verify from "../scripts/verify";
 
 interface MintpegDeployProps {
   configFilename: string;

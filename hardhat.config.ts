@@ -24,6 +24,7 @@ module.exports = {
       accounts: process.env.DEPLOY_PRIVATE_KEY
         ? [process.env.DEPLOY_PRIVATE_KEY]
         : [],
+      saveDeployments: true,
     },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
@@ -33,6 +34,9 @@ module.exports = {
         ? [process.env.DEPLOY_PRIVATE_KEY]
         : [],
     },
+  },
+  contractSizer: {
+    strict: true,
   },
   namedAccounts: {
     deployer: 0,
