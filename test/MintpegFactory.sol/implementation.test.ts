@@ -28,7 +28,7 @@ describe("setMintpegImplementation", () => {
       MintpegFactory.connect(dev).setMintpegImplementation(
         ethers.constants.AddressZero
       )
-    ).to.be.revertedWith("MintpegFactory__InvalidMintpegImplementation");
+    ).to.be.reverted;
   });
 
   it("should revert when setMintpegImplementation is called by an address other than the owner", async () => {

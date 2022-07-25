@@ -6,7 +6,7 @@ import {
   MintpegInitProps,
   createMintpeg,
   setMintpegImplementation,
-} from "../utils/helpers"; // eslint-disable-line node/no-missing-import
+} from "../utils/helpers";
 
 describe("view functions", () => {
   let Mintpeg: Contract;

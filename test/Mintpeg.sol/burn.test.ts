@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers";
 
 describe("burn", () => {
   let dev: SignerWithAddress;
@@ -32,12 +32,8 @@ describe("burn", () => {
     ]);
     await Mintpeg.connect(dev).transferFrom(dev.address, alice.address, 0);
 
-    await expect(Mintpeg.connect(dev).burn(0)).to.be.revertedWith(
-      "Mintpeg__InvalidTokenOwner"
-    );
-    await expect(Mintpeg.connect(alice).burn(1)).to.be.revertedWith(
-      "Mintpeg__InvalidTokenOwner"
-    );
+    await expect(Mintpeg.connect(dev).burn(0)).to.be.reverted;
+    await expect(Mintpeg.connect(alice).burn(1)).to.be.reverted;
   });
 
   it("should reset the royalty informaton of the burned tokenId to the global default", async () => {
