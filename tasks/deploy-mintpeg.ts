@@ -1,5 +1,3 @@
-/* eslint-disable node/no-missing-import */
-/* eslint-disable node/no-unpublished-import */
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
@@ -21,20 +19,21 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
     const mintpegFactoryAddress: string = (
       await hre.deployments.get("MintpegFactory")
     ).address;
-    const factory = await ethers.getContractAt(
+    const mintpegFactoryContract = await ethers.getContractAt(
       "MintpegFactory",
       mintpegFactoryAddress
     );
 
     console.log("-- Checking for Mintpeg implementation --");
-    const mintpegImplementation: string = await factory.mintpegImplementation();
 
+    const mintpegImplementation: string =
+      await mintpegFactoryContract.mintpegImplementation();
     if (mintpegImplementation === ethers.constants.AddressZero) {
       await hre.run("set-mintpeg-implementation");
     }
 
     const initConfig = loadLaunchConfig(configFilename);
-    const creationTx = await factory.createMintpeg(
+    const creationTx = await mintpegFactoryContract.createMintpeg(
       initConfig.name,
       initConfig.symbol,
       initConfig.royaltyReceiver,
@@ -42,17 +41,24 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
     );
     await creationTx.wait();
 
-    const mintpegNumber: BigNumber = await factory.getTotalMintpegsCount();
-    const mintpegAddress: string = await factory.allMintpegs(
-      mintpegNumber.sub(BigNumber.from(1))
-    );
+    const mintpegNumber: BigNumber =
+      await mintpegFactoryContract.getTotalMintpegsCount();
+    const deployedMintpegAddress: string =
+      await mintpegFactoryContract.allMintpegs(
+        mintpegNumber.sub(BigNumber.from(1))
+      );
 
-    console.log(`-- Mintpeg deployed at ${mintpegAddress} --`);
+    console.log(`-- Mintpeg deployed at ${deployedMintpegAddress} --`);
 
-    const delayTime = 60;
+    const delayTime = 30;
     console.log(
       `-- Waiting for ${delayTime} seconds for Snowtrace to index Mintpeg Contract --`
     );
     await delay(delayTime);
-    await verify(hre, "contracts/Mintpeg.sol:Mintpeg", mintpegAddress, []);
+    await verify(
+      hre,
+      "contracts/Mintpeg.sol:Mintpeg",
+      deployedMintpegAddress,
+      []
+    );
   });
