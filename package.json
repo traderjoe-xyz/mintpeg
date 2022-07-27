@@ -10,6 +10,7 @@
     "test-fuji": "npx hardhat test --network fuji",
     "deploy-fuji": "npx hardhat deploy --network fuji",
     "deploy-mainnet": "npx hardhat deploy --network avalanche",
+    "deploy-mintpeg-fuji": "npx hardhat deploy-mintpeg --network fuji",
     "deploy-mintpeg-mainnet": "npx hardhat deploy-mintpeg --network avalanche"
   },
   "license": "MIT",
