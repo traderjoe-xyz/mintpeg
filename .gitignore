@@ -11,3 +11,4 @@ artifacts
 
 # Dev files
 playground.ts
+.DS_Store
