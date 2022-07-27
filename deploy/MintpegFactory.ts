@@ -1,5 +1,3 @@
-/* eslint-disable node/no-missing-import */
-/* eslint-disable node/no-unpublished-import */
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import verify from "../scripts/verify";
 
@@ -22,5 +20,6 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
     mintpegFactoryContract.address,
     []
   );
+  await hre.run("set-mintpeg-implementation");
 };
 module.exports.tags = ["MintpegFactory"];

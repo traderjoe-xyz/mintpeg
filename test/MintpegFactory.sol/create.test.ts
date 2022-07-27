@@ -6,7 +6,7 @@ import {
   MintpegInitProps,
   createMintpeg,
   setMintpegImplementation,
-} from "../utils/helpers"; // eslint-disable-line node/no-missing-import
+} from "../utils/helpers";
 
 describe("createMintpeg", () => {
   let Mintpeg: Contract;
@@ -43,7 +43,7 @@ describe("createMintpeg", () => {
         mintpegInit._royaltyReceiver,
         mintpegInit._feePercent
       )
-    ).to.be.revertedWith("MintpegFactory__InvalidMintpegImplementation()");
+    ).to.be.reverted;
   });
 
   it("should add the address of created Mintpeg to allMintpegs array", async () => {
