@@ -1,5 +1,3 @@
-/* eslint-disable node/no-missing-import */
-/* eslint-disable node/no-unpublished-import */
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
@@ -12,18 +10,25 @@ task(
   console.log("-- Setting Mintpeg implmentation --");
 
   const ethers = hre.ethers;
-  const baseMintpegAddress: string = (await hre.deployments.get("Mintpeg"))
-    .address;
-  const mintpegFactoryAddress: string = (
-    await hre.deployments.get("MintpegFactory")
-  ).address;
-  const factory = await ethers.getContractAt(
+  const mintpeg = await hre.deployments.get("Mintpeg");
+  const mintpegFactory = await hre.deployments.get("MintpegFactory");
+  const mintpegFactoryContract = await ethers.getContractAt(
     "MintpegFactory",
-    mintpegFactoryAddress
+    mintpegFactory.address
   );
+  const currentMintpegImplementation: string =
+    await mintpegFactoryContract.mintpegImplementation();
 
-  const setMintpegImplementationTx = await factory.setMintpegImplementation(
-    baseMintpegAddress
-  );
-  await setMintpegImplementationTx.wait();
+  if (currentMintpegImplementation === mintpeg.implementation) {
+    console.log(
+      `-- Mintpeg implmentation already set to ${mintpeg.implementation} --`
+    );
+  } else {
+    const setMintpegImplementationTx =
+      await mintpegFactoryContract.setMintpegImplementation(
+        mintpeg.implementation ?? ""
+      );
+    await setMintpegImplementationTx.wait();
+    console.log(`-- Mintpeg implmentation set to ${mintpeg.implementation} --`);
+  }
 });

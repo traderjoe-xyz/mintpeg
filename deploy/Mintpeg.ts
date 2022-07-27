@@ -1,5 +1,3 @@
-/* eslint-disable node/no-missing-import */
-/* eslint-disable node/no-unpublished-import */
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import verify from "../scripts/verify";
 
@@ -28,7 +26,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
   await verify(
     hre,
     "contracts/Mintpeg.sol:Mintpeg",
-    mintpegContract.implementation,
+    mintpegContract.implementation ?? mintpegContract.address,
     []
   );
 };

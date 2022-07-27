@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers";
 
 describe("initialize", () => {
   let dev: SignerWithAddress;
@@ -55,9 +55,8 @@ describe("initialize", () => {
   });
 
   it("should revert if royalty percent is more than 25% (2500)", async () => {
-    await expect(
-      initializeMintpeg(Mintpeg, { _feePercent: 2501 }, mintpegInit)
-    ).to.be.revertedWith("Mintpeg__InvalidRoyaltyInfo()");
+    await expect(initializeMintpeg(Mintpeg, { _feePercent: 2501 }, mintpegInit))
+      .to.be.reverted;
   });
 
   it("should emit `InitializedMintpeg` event with the deployment information", async () => {

@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber, Contract, ContractFactory } from "ethers";
-import { MintpegInitProps, initializeMintpeg } from "../utils/helpers"; // eslint-disable-line node/no-missing-import
+import { MintpegInitProps, initializeMintpeg } from "../utils/helpers";
 
 describe("royalty", () => {
   let dev: SignerWithAddress;
@@ -28,9 +28,8 @@ describe("royalty", () => {
     it("should revert if royalty percent is more than 25% (2500)", async () => {
       await initializeMintpeg(Mintpeg, {}, mintpegInit);
 
-      await expect(
-        Mintpeg.connect(dev).setRoyaltyInfo(dev.address, 2501)
-      ).to.be.revertedWith("Mintpeg__InvalidRoyaltyInfo()");
+      await expect(Mintpeg.connect(dev).setRoyaltyInfo(dev.address, 2501)).to.be
+        .reverted;
     });
 
     it("should revert if royalty is attempted to be set by an address other than the owner", async () => {
@@ -78,7 +77,7 @@ describe("royalty", () => {
 
       await expect(
         Mintpeg.connect(dev).setTokenRoyaltyInfo(0, dev.address, 2501)
-      ).to.be.revertedWith("Mintpeg__InvalidRoyaltyInfo()");
+      ).to.be.reverted;
     });
 
     it("should revert if token royalty is attempted to be set by an address other than the owner", async () => {
