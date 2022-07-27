@@ -62,6 +62,8 @@ contract MintpegFactory is Ownable {
             _royaltyReceiver,
             _feePercent
         );
+        IMintpeg(mintpeg).transferOwnership(msg.sender);
+
         allMintpegs.push(mintpeg);
         createdMintpegs[msg.sender].push(mintpeg);
 
