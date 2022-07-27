@@ -11,4 +11,6 @@ interface IMintpeg {
         address _royaltyReceiver,
         uint96 _feePercent
     ) external;
+
+    function transferOwnership(address newOwner) external;
 }
