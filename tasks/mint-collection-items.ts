@@ -55,9 +55,13 @@ task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
       try {
         console.log("-- Uploading Images to IPFS --");
 
-        const ipfsCidUrls = await axios.post(JOEBARN_API_URL, form, {
-          headers: form.getHeaders(),
-        });
+        const ipfsCidUrls = await axios.post(
+          `${JOEBARN_API_URL}/v2/mints/upload`,
+          form,
+          {
+            headers: form.getHeaders(),
+          }
+        );
 
         console.log(`-- Minting Token(s) from IPFS CID(s) --`);
 
