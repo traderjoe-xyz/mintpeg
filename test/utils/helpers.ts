@@ -5,6 +5,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 export interface MintpegInitProps {
   _collectionName: string;
   _collectionSymbol: string;
+  _projectOwner: string;
   _royaltyReceiver: string;
   _feePercent: number;
 }
@@ -20,6 +21,7 @@ export const initializeMintpeg = async (
     .initialize(
       config._collectionName || baseConfig._collectionName,
       config._collectionSymbol || baseConfig._collectionSymbol,
+      config._projectOwner || baseConfig._projectOwner,
       config._royaltyReceiver || baseConfig._royaltyReceiver,
       config._feePercent || baseConfig._feePercent
     );
