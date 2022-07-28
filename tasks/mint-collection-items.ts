@@ -4,6 +4,7 @@ import "hardhat-deploy-ethers";
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
+import "dotenv/config";
 import { task } from "hardhat/config";
 import { loadMintConfig } from "./utils";
 
@@ -14,14 +15,22 @@ interface AddCollectionItemsProps {
 }
 
 task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
-  .addParam("metaFilename")
-  .addParam("itemFilename")
-  .addParam("mintpegAddress")
+  .addParam("metaFilename", "JSON file for an array of metadata")
+  .addParam("itemFilename", "JSON file for an array of item(images) names")
+  .addParam(
+    "mintpegAddress",
+    "contract address of deployed Mintpeg to mint items from"
+  )
   .setAction(
     async (
       { metaFilename, itemFilename, mintpegAddress }: AddCollectionItemsProps,
       hre
     ) => {
+      const JOEBARN_API_URL = process.env.JOEBARN_API_URL;
+      if (!JOEBARN_API_URL) {
+        throw new Error("JOEBARN_API_URL env variable not set!");
+      }
+
       console.log("-- Reading Images and Metadatas --");
 
       // create form-data
@@ -46,11 +55,9 @@ task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
       try {
         console.log("-- Uploading Images to IPFS --");
 
-        const ipfsCidUrls = await axios.post(
-          "https://barn.joepegs.app/v2/mints/upload",
-          form,
-          { headers: form.getHeaders() }
-        );
+        const ipfsCidUrls = await axios.post(JOEBARN_API_URL, form, {
+          headers: form.getHeaders(),
+        });
 
         console.log(`-- Minting Token(s) from IPFS CID(s) --`);
 
