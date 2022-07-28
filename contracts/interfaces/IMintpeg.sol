@@ -8,9 +8,8 @@ interface IMintpeg {
     function initialize(
         string memory _collectionName,
         string memory _collectionSymbol,
+        address _projectOwner,
         address _royaltyReceiver,
         uint96 _feePercent
     ) external;
-
-    function transferOwnership(address newOwner) external;
 }
