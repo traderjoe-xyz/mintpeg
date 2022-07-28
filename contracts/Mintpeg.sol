@@ -60,6 +60,7 @@ contract Mintpeg is
     function initialize(
         string memory _collectionName,
         string memory _collectionSymbol,
+        address _projectOwner,
         address _royaltyReceiver,
         uint96 _feePercent
     ) external initializer {
@@ -67,6 +68,7 @@ contract Mintpeg is
         __ERC2981_init();
         __ERC721_init(_collectionName, _collectionSymbol);
         setRoyaltyInfo(_royaltyReceiver, _feePercent);
+        transferOwnership(_projectOwner);
 
         emit InitializedMintpeg(
             _collectionName,
