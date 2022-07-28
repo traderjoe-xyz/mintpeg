@@ -18,6 +18,7 @@ describe("initialize", () => {
     mintpegInit = {
       _collectionName: "JoePEG",
       _collectionSymbol: "JPG",
+      _projectOwner: dev.address,
       _royaltyReceiver: dev.address,
       _feePercent: 500,
     };
@@ -64,6 +65,7 @@ describe("initialize", () => {
       Mintpeg.connect(dev).initialize(
         mintpegInit._collectionName,
         mintpegInit._collectionSymbol,
+        dev.address,
         mintpegInit._royaltyReceiver,
         mintpegInit._feePercent
       )
@@ -83,6 +85,7 @@ describe("initialize", () => {
       Mintpeg.connect(dev).initialize(
         mintpegInit._collectionName,
         mintpegInit._collectionSymbol,
+        dev.address,
         mintpegInit._royaltyReceiver,
         mintpegInit._feePercent
       )

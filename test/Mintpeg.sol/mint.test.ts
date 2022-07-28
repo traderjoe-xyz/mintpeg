@@ -19,6 +19,7 @@ describe("mint", () => {
     mintpegInit = {
       _collectionName: "JoePEG",
       _collectionSymbol: "JPG",
+      _projectOwner: dev.address,
       _royaltyReceiver: dev.address,
       _feePercent: 500,
     };

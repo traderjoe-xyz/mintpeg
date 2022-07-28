@@ -30,6 +30,7 @@ describe("createMintpeg", () => {
     mintpegInit = {
       _collectionName: "JoePEG",
       _collectionSymbol: "JPG",
+      _projectOwner: dev.address,
       _royaltyReceiver: dev.address,
       _feePercent: 500,
     };
@@ -69,6 +70,18 @@ describe("createMintpeg", () => {
     expect(
       await MintpegFactory.getNumberOfMintpegsCreated(alice.address)
     ).to.equal(2);
+  });
+
+  it("should transfer the ownership of the Mintpeg contract to the message's sender", async () => {
+    await setMintpegImplementation(MintpegFactory, Mintpeg.address);
+    await createMintpeg(MintpegFactory, {}, mintpegInit, dev);
+
+    const createdMintpegAddress: string = await MintpegFactory.allMintpegs(0);
+    const createdMintpegContract: Contract = await ethers.getContractAt(
+      "Mintpeg",
+      createdMintpegAddress
+    );
+    expect(await createdMintpegContract.owner()).to.equal(dev.address);
   });
 
   it("should emit `MintpegCreated` event when Mintpeg is created", async () => {
