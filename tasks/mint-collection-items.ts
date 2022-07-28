@@ -3,7 +3,7 @@ import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import axios from "axios";
 import FormData from "form-data";
-import fs, { ReadStream } from "fs";
+import fs from "fs";
 import { task } from "hardhat/config";
 import { loadMintConfig } from "./utils";
 
@@ -46,8 +46,8 @@ task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
       try {
         console.log("-- Uploading Images to IPFS --");
 
-        const ipfsCidUrls: string[] = await axios.post(
-          "http://localhost:8000/v2/mints/upload",
+        const ipfsCidUrls = await axios.post(
+          "https://barn.joepegs.app/v2/mints/upload",
           form,
           { headers: form.getHeaders() }
         );
@@ -59,9 +59,11 @@ task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
           "Mintpeg",
           mintpegAddress
         );
-        const mintTx = await mintpegContract.mint(ipfsCidUrls);
+        const mintTx = await mintpegContract.mint(ipfsCidUrls.data);
         await mintTx.wait();
-        console.log(`-- Minted ${ipfsCidUrls.length} tokens ${mintpegAddress}  --`);
+        console.log(
+          `-- Minted ${ipfsCidUrls.data.length} token(s) from ${mintpegAddress}  --`
+        );
       } catch (error) {
         console.log(error);
       }
