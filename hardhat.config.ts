@@ -4,6 +4,7 @@ import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import "./tasks/deploy-mintpeg";
 import "./tasks/set-mintpeg-implementation";
+import "./tasks/mint-collection-items";
 
 module.exports = {
   solidity: "0.8.7",
