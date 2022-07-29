@@ -65,16 +65,34 @@ yarn compile
 yarn deploy-mintpeg-<<network>> --config-filename <config-filename>
 ```
 
+## Add item to Collection
+
+The following environment variable should be set in the `.env` file:
+
+```
+# Base url of endpoint to upload items to IPFS
+JOEBARN_API_URL=
+```
+
+Adding items to a Mintpeg contract instance requires the `metadata` and `images` config to be set. Items should be moved into the `/tasks/config/mint/images` directory. `images.json` file should contain an array of item(image) filenames to be minted. The `metadata.json` file should contain an array of metadatas of the items to be minted.
+**Note:** the objects in the `metadata.json` should *not* contain an `image` field(key). The endpoint handles uploading images to IPFS and setting the `image` field in the metadatas.
+
+Once the configuration is set, you may run:
+
+```
+# network is either fuji or mainnet(avalanche)
+yarn mint-items-<<network>> --item-filename images.json --meta-filename metadata.json --mintpeg-address <<address of deployed Mitpeg>>
+```
 
 ## Test coverage
 
 Test coverage on current commit `fd24448` is the following :
-File                   |  % Stmts | % Branch |  % Funcs |  % Lines |
+File | % Stmts | % Branch | % Funcs | % Lines |
 -----------------------|----------|----------|----------|----------|
-  Mintpeg.sol          |    95.24 |      100 |    83.33 |    95.83 |
-  MinpegErrors.sol     |      100 |      100 |      100 |      100 |
-  MintpegFactory.sol   |      100 |      100 |      100 |      100 |
-  **All files**        |    97.06 |      100 |    91.67 |    97.44 |
+Mintpeg.sol | 95.24 | 100 | 83.33 | 95.83 |
+MinpegErrors.sol | 100 | 100 | 100 | 100 |
+MintpegFactory.sol | 100 | 100 | 100 | 100 |
+**All files** | 97.06 | 100 | 91.67 | 97.44 |
 
 Coverage was calculated by the `solidity-coverage` plugin from hardhat.
 
