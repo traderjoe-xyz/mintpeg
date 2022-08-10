@@ -9,14 +9,14 @@ import { task } from "hardhat/config";
 import { loadMintConfig } from "./utils";
 
 interface AddCollectionItemsProps {
-  metaFilename: string;
-  itemFilename: string;
+  metaFilename: string | undefined;
+  itemFilename: string | undefined;
   mintpegAddress: string;
 }
 
 task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
-  .addParam("metaFilename", "JSON file for an array of metadata")
-  .addParam("itemFilename", "JSON file for an array of item(images) names")
+  .addOptionalParam("metaFilename", "JSON file for an array of metadata")
+  .addOptionalParam("itemFilename", "JSON file for an array of item(images) names")
   .addParam(
     "mintpegAddress",
     "contract address of deployed Mintpeg to mint items from"
@@ -35,8 +35,8 @@ task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
 
       // create form-data
       const form = new FormData();
-      const metaDatas: Array<Object> = loadMintConfig(metaFilename);
-      const imageNames: string[] = loadMintConfig(itemFilename);
+      const metaDatas: Array<Object> = loadMintConfig(metaFilename ?? "metadata.json");
+      const imageNames: string[] = loadMintConfig(itemFilename ?? "images.json");
       if (metaDatas.length !== imageNames.length) {
         throw new Error(
           `Mismatch config count: ${metaDatas.length} metadata gotten for ${imageNames.length} images`

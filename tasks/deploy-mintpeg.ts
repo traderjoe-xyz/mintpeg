@@ -7,11 +7,11 @@ import { BigNumber } from "ethers";
 import verify from "../scripts/verify";
 
 interface MintpegDeployProps {
-  configFilename: string;
+  configFilename: string | undefined;
 }
 
 task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
-  .addParam("configFilename")
+  .addOptionalParam("configFilename")
   .setAction(async ({ configFilename }: MintpegDeployProps, hre) => {
     console.log("-- Deploying Mintpeg --");
 
@@ -32,7 +32,7 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
       await hre.run("set-mintpeg-implementation");
     }
 
-    const initConfig = loadLaunchConfig(configFilename);
+    const initConfig = loadLaunchConfig(configFilename ?? "mintpeg.json");
     const creationTx = await mintpegFactoryContract.createMintpeg(
       initConfig.name,
       initConfig.symbol,
