@@ -60,6 +60,8 @@ task("mint-collection-items", "Mint new NFTs to a Mintpeg contract instance")
           form,
           {
             headers: form.getHeaders(),
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
           }
         );
 
