@@ -15,7 +15,7 @@ module.exports = async (hre: HardhatRuntimeEnvironment) => {
       execute: {
         init: {
           methodName: "initialize",
-          args: ["Joepegs", "JOEPEGS", deployer, 500],
+          args: ["Joepegs", "JOEPEGS", deployer, deployer, 500],
         },
       },
     },
