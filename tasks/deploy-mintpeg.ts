@@ -16,9 +16,7 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
     console.log("-- Deploying Mintpeg --");
 
     const ethers = hre.ethers;
-    const mintpegFactoryAddress: string = (
-      await hre.deployments.get("MintpegFactory")
-    ).address;
+    const mintpegFactoryAddress: string = (await hre.deployments.get("MintpegFactory")).address;
     const mintpegFactoryContract = await ethers.getContractAt(
       "MintpegFactory",
       mintpegFactoryAddress
@@ -26,8 +24,7 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
 
     console.log("-- Checking for Mintpeg implementation --");
 
-    const mintpegImplementation: string =
-      await mintpegFactoryContract.mintpegImplementation();
+    const mintpegImplementation: string = await mintpegFactoryContract.mintpegImplementation();
     if (mintpegImplementation === ethers.constants.AddressZero) {
       await hre.run("set-mintpeg-implementation");
     }
@@ -41,24 +38,12 @@ task("deploy-mintpeg", "Deploys an instance of Mintpeg contract")
     );
     await creationTx.wait();
 
-    const mintpegNumber: BigNumber =
-      await mintpegFactoryContract.getTotalMintpegsCount();
-    const deployedMintpegAddress: string =
-      await mintpegFactoryContract.allMintpegs(
-        mintpegNumber.sub(BigNumber.from(1))
-      );
+    const mintpegNumber: BigNumber = await mintpegFactoryContract.getTotalMintpegsCount();
+    const deployedMintpegAddress: string = await mintpegFactoryContract.allMintpegs(
+      mintpegNumber.sub(BigNumber.from(1))
+    );
 
     console.log(`-- Mintpeg deployed at ${deployedMintpegAddress} --`);
 
-    const delayTime = 30;
-    console.log(
-      `-- Waiting for ${delayTime} seconds for Snowtrace to index Mintpeg Contract --`
-    );
-    await delay(delayTime);
-    await verify(
-      hre,
-      "contracts/Mintpeg.sol:Mintpeg",
-      deployedMintpegAddress,
-      []
-    );
+    return { deployedMintpegAddress, initConfig };
   });
