@@ -17,13 +17,17 @@ module.exports = {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       gasPrice: 26000000000,
       chainId: 43113,
-      accounts: process.env.DEPLOY_PRIVATE_KEY ? [`0x${process.env.DEPLOY_PRIVATE_KEY}`] : [],
+      accounts: process.env.DEPLOY_PRIVATE_KEY
+        ? [`0x${process.env.DEPLOY_PRIVATE_KEY}`]
+        : [],
     },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       gasPrice: 26000000000,
       chainId: 43114,
-      accounts: process.env.DEPLOY_PRIVATE_KEY ? [`0x${process.env.DEPLOY_PRIVATE_KEY}`] : [],
+      accounts: process.env.DEPLOY_PRIVATE_KEY
+        ? [`0x${process.env.DEPLOY_PRIVATE_KEY}`]
+        : [],
     },
   },
   contractSizer: {
