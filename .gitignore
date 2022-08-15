@@ -8,6 +8,7 @@ typechain-types
 # Hardhat files
 cache
 artifacts
+deployments/localhost
 
 # Dev files
 playground.ts
