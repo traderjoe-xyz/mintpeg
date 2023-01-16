@@ -30,11 +30,11 @@ module.exports = {
         : [],
     },
     bscTestnet: {
-      url: process.env.BNB_RPC_ENDPOINT,
+      url: process.env.BSC_TESTNET_RPC_ENDPOINT,
       gasPrice: 20_000_000_000,
       chainId: 97,
-      accounts: process.env.BNB_TESTNET_DEPLOYER
-        ? [process.env.BNB_TESTNET_DEPLOYER]
+      accounts: process.env.BSC_TESTNET_DEPLOYER
+        ? [process.env.BSC_TESTNET_DEPLOYER]
         : [],
     },
     bsc: {
@@ -56,7 +56,7 @@ module.exports = {
     apiKey: {
       avalanche: process.env.SNOWTRACE_API_KEY,
       avalancheFujiTestnet: process.env.SNOWTRACE_API_KEY,
-      bscTestnet: process.env.BNB_API_KEY,
+      bscTestnet: process.env.BSC_API_KEY,
       bsc: process.env.BSC_API_KEY,
     },
   },
