@@ -128,6 +128,34 @@ contract Mintpeg is
         emit TokenRoyaltyInfoChanged(_tokenId, _royaltyReceiver, _feePercent);
     }
 
+    /// @notice Function for changing individual token URI
+    /// @dev Can only be called by project owner
+    /// @param _tokenId Token ID that will have URI changed
+    /// @param _tokenURI Token URI to change to
+    function setTokenURI(uint256 _tokenId, string memory _tokenURI)
+        public
+        onlyOwner
+    {
+        _setTokenURI(_tokenId, _tokenURI);
+    }
+
+    /// @notice Function for changing multiple token URIs
+    /// @dev Can only be called by project owner
+    /// @param _ids Token IDs that will have URI changed
+    /// @param _URIs Token URIs to change to
+    function setTokenURIs(uint256[] memory _ids, string[] memory _URIs)
+        public
+        onlyOwner
+    {
+        uint256 length = _ids.length;
+        if (length != _URIs.length) {
+            revert Mintpeg__InvalidLength();
+        }
+        for (uint256 i; i < length; i++) {
+            _setTokenURI(_ids[i], _URIs[i]);
+        }
+    }
+
     /// @notice Function to burn a token
     /// @dev Can only be called by token owner
     /// @param _tokenId Token ID to be burnt
