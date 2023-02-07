@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "operator-filter-registry/src/IOperatorFilterRegistry.sol";
 
 import "./MintpegErrors.sol";
 
@@ -17,6 +18,10 @@ contract Mintpeg is
     OwnableUpgradeable
 {
     using Counters for Counters.Counter;
+
+    /// @notice Contract filtering allowed operators, preventing unauthorized contract to transfer NFTs
+    /// By default, Mintpeg contracts are subscribed to OpenSea's Curated Subscription Address at 0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6
+    IOperatorFilterRegistry public operatorFilterRegistry;
 
     Counters.Counter private _tokenIds;
 
@@ -52,6 +57,28 @@ contract Mintpeg is
         uint96 _feePercent
     );
 
+    /// @dev Emitted on updateOperatorFilterRegistryAddress()
+    /// @param operatorFilterRegistry New operator filter registry
+    event OperatorFilterRegistryUpdated(
+        IOperatorFilterRegistry indexed operatorFilterRegistry
+    );
+
+    /// @notice Allow spending tokens from addresses with balance
+    /// Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
+    /// from an EOA.
+    modifier onlyAllowedOperator(address from) virtual {
+        if (from != msg.sender) {
+            _checkFilterOperator(msg.sender);
+        }
+        _;
+    }
+
+    /// @notice Allow approving tokens transfers
+    modifier onlyAllowedOperatorApproval(address operator) virtual {
+        _checkFilterOperator(operator);
+        _;
+    }
+
     /// @notice Mintpeg initialization
     /// @param _collectionName ERC721 name
     /// @param _collectionSymbol ERC721 symbol
@@ -69,6 +96,18 @@ contract Mintpeg is
         __ERC721_init(_collectionName, _collectionSymbol);
         setRoyaltyInfo(_royaltyReceiver, _feePercent);
         transferOwnership(_projectOwner);
+
+        // Initialize the operator filter registry and subcribe to OpenSea's list
+        IOperatorFilterRegistry _operatorFilterRegistry = IOperatorFilterRegistry(
+                0x000000000000AAeB6D7670E522A718067333cd4E
+            );
+        if (address(_operatorFilterRegistry).code.length > 0) {
+            _operatorFilterRegistry.registerAndSubscribe(
+                address(this),
+                0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6
+            );
+        }
+        _updateOperatorFilterRegistryAddress(_operatorFilterRegistry);
 
         emit InitializedMintpeg(
             _collectionName,
@@ -128,6 +167,43 @@ contract Mintpeg is
         emit TokenRoyaltyInfoChanged(_tokenId, _royaltyReceiver, _feePercent);
     }
 
+    /// @notice Function for changing individual token URI
+    /// @dev Can only be called by project owner
+    /// @param _tokenId Token ID that will have URI changed
+    /// @param _tokenURI Token URI to change to
+    function setTokenURI(uint256 _tokenId, string memory _tokenURI)
+        public
+        onlyOwner
+    {
+        _setTokenURI(_tokenId, _tokenURI);
+    }
+
+    /// @notice Function for changing multiple token URIs
+    /// @dev Can only be called by project owner
+    /// @param _ids Token IDs that will have URI changed
+    /// @param _URIs Token URIs to change to
+    function setTokenURIs(uint256[] memory _ids, string[] memory _URIs)
+        public
+        onlyOwner
+    {
+        uint256 length = _ids.length;
+        if (length != _URIs.length) {
+            revert Mintpeg__InvalidLength();
+        }
+        for (uint256 i; i < length; i++) {
+            _setTokenURI(_ids[i], _URIs[i]);
+        }
+    }
+
+    /// @notice Update the address that the contract will make OperatorFilter checks against. When set to the zero
+    /// address, checks will be bypassed. OnlyOwner
+    /// @param _newRegistry The address of the new OperatorFilterRegistry
+    function updateOperatorFilterRegistryAddress(
+        IOperatorFilterRegistry _newRegistry
+    ) external onlyOwner {
+        _updateOperatorFilterRegistryAddress(_newRegistry);
+    }
+
     /// @notice Function to burn a token
     /// @dev Can only be called by token owner
     /// @param _tokenId Token ID to be burnt
@@ -154,5 +230,87 @@ contract Mintpeg is
             ERC721Upgradeable.supportsInterface(_interfaceId) ||
             ERC2981Upgradeable.supportsInterface(_interfaceId) ||
             super.supportsInterface(_interfaceId);
+    }
+
+    /// @dev Update the address that the contract will make OperatorFilter checks against. When set to the zero
+    /// address, checks will be bypassed.
+    /// @param _newRegistry The address of the new OperatorFilterRegistry
+    function _updateOperatorFilterRegistryAddress(
+        IOperatorFilterRegistry _newRegistry
+    ) private {
+        operatorFilterRegistry = _newRegistry;
+        emit OperatorFilterRegistryUpdated(_newRegistry);
+    }
+
+    /// @dev Checks if the address (the operator) trying to transfer the NFT is allowed
+    /// @param operator Address of the operator
+    function _checkFilterOperator(address operator) internal view virtual {
+        IOperatorFilterRegistry registry = operatorFilterRegistry;
+        // Check registry code length to facilitate testing in environments without a deployed registry.
+        if (address(registry).code.length > 0) {
+            if (!registry.isOperatorAllowed(address(this), operator)) {
+                revert Mintpeg__OperatorNotAllowed(operator);
+            }
+        }
+    }
+
+    /// @dev `setApprovalForAll` wrapper to prevent the sender to approve a non-allowed operator
+    /// @param operator Address being approved
+    /// @param approved Whether the operator is approved or not
+    function setApprovalForAll(address operator, bool approved)
+        public
+        override
+        onlyAllowedOperatorApproval(operator)
+    {
+        super.setApprovalForAll(operator, approved);
+    }
+
+    /// @dev `aprove` wrapper to prevent the sender to approve a non-allowed operator
+    /// @param operator Address being approved
+    /// @param tokenId TokenID approved
+    function approve(address operator, uint256 tokenId)
+        public
+        override
+        onlyAllowedOperatorApproval(operator)
+    {
+        super.approve(operator, tokenId);
+    }
+
+    /// @dev `transferFrom` wrapper to prevent a non-allowed operator to transfer the NFT
+    /// @param from Address to transfer from
+    /// @param to Address to transfer to
+    /// @param tokenId TokenID to transfer
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override onlyAllowedOperator(from) {
+        super.transferFrom(from, to, tokenId);
+    }
+
+    /// @dev `safeTransferFrom` wrapper to prevent a non-allowed operator to transfer the NFT
+    /// @param from Address to transfer from
+    /// @param to Address to transfer to
+    /// @param tokenId TokenID to transfer
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    /// @dev `safeTransferFrom` wrapper to prevent a non-allowed operator to transfer the NFT
+    /// @param from Address to transfer from
+    /// @param to Address to transfer to
+    /// @param tokenId TokenID to transfer
+    /// @param data Data to send along with a safe transfer check
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId, data);
     }
 }
