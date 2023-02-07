@@ -10,7 +10,16 @@ glob.sync("./tasks/**/*.ts").forEach(function (file) {
 });
 
 module.exports = {
-  solidity: "0.8.7",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.7",
+      },
+      {
+        version: "0.8.13",
+      },
+    ],
+  },
   networks: {
     hardhat: {},
     fuji: {
